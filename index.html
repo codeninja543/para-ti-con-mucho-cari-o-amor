@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lucero y Felix </title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #e8436a;
+    --blush: #f7b8cb;
+    --deep: #1a0a12;
+    --purple: #7c3a6b;
+    --gold: #d4a96a;
+    --cream: #fdf6f0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--deep);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+  }
+
+  #particles {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .petal {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50% 0 50% 0;
+    opacity: 0;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 0.8; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  .banner {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 50px 20px 30px;
+    background: linear-gradient(180deg, #2d0a1f 0%, transparent 100%);
+  }
+  .banner h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 6vw, 4.5rem);
+    font-style: italic;
+    background: linear-gradient(135deg, #f7b8cb, #d4a96a, #e8436a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    letter-spacing: 1px;
+  }
+  .banner .subtitle {
+    font-size: 1.1rem;
+    color: var(--blush);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-top: 8px;
+    opacity: 0.8;
+  }
+  .banner .heart-divider {
+    font-size: 1.4rem;
+    margin: 16px 0 0;
+    letter-spacing: 8px;
+  }
+
+  .player-section {
+    position: relative; z-index: 1;
+    max-width: 480px;
+    margin: 0 auto 50px;
+    padding: 0 20px;
+  }
+  .player-card {
+    background: linear-gradient(145deg, rgba(124,58,107,0.6), rgba(232,67,106,0.2));
+    border: 1px solid rgba(247,184,203,0.25);
+    border-radius: 24px;
+    padding: 28px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .player-top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+  .album-art {
+    width: 72px; height: 72px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--rose), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(232,67,106,0.4);
+    animation: pulse-art 3s ease-in-out infinite;
+  }
+  @keyframes pulse-art {
+    0%, 100% { box-shadow: 0 8px 24px rgba(232,67,106,0.4); }
+    50% { box-shadow: 0 8px 40px rgba(232,67,106,0.7); }
+  }
+  .song-info { flex: 1; min-width: 0; }
+  .song-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--cream);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .song-artist {
+    font-size: 0.9rem;
+    color: var(--blush);
+    opacity: 0.8;
+    margin-top: 3px;
+  }
+
+  .progress-wrap { margin-bottom: 18px; }
+  .progress-bar {
+    width: 100%; height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 99px;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--rose), var(--gold));
+    width: 0%;
+    transition: width 0.3s;
+    position: relative;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -4px; top: 50%;
+    transform: translateY(-50%);
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 6px var(--gold);
+  }
+  .time-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.78rem; color: rgba(247,184,203,0.6);
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  .play-btn {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose), var(--purple));
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 20px rgba(232,67,106,0.5);
+    transition: all 0.2s;
+  }
+  .play-btn:hover { transform: scale(1.08); box-shadow: 0 8px 28px rgba(232,67,106,0.7); }
+
+  .section-label {
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--blush);
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    position: relative; z-index: 1;
+  }
+  .section-label::before,
+  .section-label::after {
+    content: '—';
+    margin: 0 12px;
+    opacity: 0.5;
+  }
+
+  .gallery-section {
+    position: relative; z-index: 1;
+    padding: 10px 20px 50px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .photo-card {
+    aspect-ratio: 3/4;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid rgba(247,184,203,0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .photo-card:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 20px 50px rgba(232,67,106,0.3); }
+  .photo-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-placeholder {
+    width: 100%; height: 100%;
+    background: linear-gradient(145deg, rgba(124,58,107,0.7), rgba(232,67,106,0.3));
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px;
+  }
+  .photo-placeholder .icon { font-size: 2.8rem; }
+  .photo-placeholder .hint {
+    font-size: 0.8rem;
+    color: rgba(247,184,203,0.6);
+    text-align: center;
+    padding: 0 12px;
+    letter-spacing: 1px;
+  }
+  .photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(0deg, rgba(26,10,18,0.7) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex; align-items: flex-end;
+    padding: 14px;
+  }
+  .photo-card:hover .photo-overlay { opacity: 1; }
+  .photo-overlay span {
+    font-size: 0.85rem;
+    color: var(--cream);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .lightbox {
+    display: none;
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.92);
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 90vw; max-height: 88vh;
+    border-radius: 16px;
+    box-shadow: 0 0 80px rgba(232,67,106,0.4);
+    object-fit: contain;
+  }
+  .lightbox-close {
+    position: fixed; top: 20px; right: 28px;
+    font-size: 2.4rem; color: var(--cream);
+    cursor: pointer; background: none; border: none;
+    opacity: 0.7; transition: opacity 0.2s;
+  }
+  .lightbox-close:hover { opacity: 1; }
+
+  .counter-section {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 10px 20px 50px;
+  }
+  .counter-card {
+    display: inline-flex;
+    gap: 24px;
+    background: linear-gradient(135deg, rgba(124,58,107,0.4), rgba(26,10,18,0.8));
+    border: 1px solid rgba(212,169,106,0.3);
+    border-radius: 20px;
+    padding: 28px 36px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+  .counter-unit { text-align: center; }
+  .counter-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    display: block;
+  }
+  .counter-lbl {
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(247,184,203,0.6);
+    margin-top: 6px;
+    display: block;
+  }
+  .counter-sep {
+    font-size: 2.5rem;
+    color: rgba(212,169,106,0.4);
+    line-height: 1.1;
+    align-self: flex-start;
+    padding-top: 8px;
+  }
+
+  .quote-section {
+    position: relative; z-index: 1;
+    max-width: 680px;
+    margin: 0 auto 60px;
+    padding: 0 30px;
+    text-align: center;
+  }
+  .quote-marks {
+    font-family: 'Playfair Display', serif;
+    font-size: 6rem;
+    color: rgba(232,67,106,0.25);
+    line-height: 0.5;
+    display: block;
+    margin-bottom: 20px;
+  }
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
+    font-style: italic;
+    color: var(--cream);
+    line-height: 1.7;
+  }
+  .quote-author {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.8;
+  }
+
+  .video-section {
+    position: relative; z-index: 1;
+    max-width: 700px;
+    margin: 0 auto 70px;
+    padding: 0 20px;
+  }
+  .video-wrap {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(247,184,203,0.2);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    aspect-ratio: 16/9;
+    background: rgba(26,10,18,0.8);
+  }
+  .video-wrap video {
+    width: 100%; height: 100%;
+    border: none;
+    display: block;
+    border-radius: 20px;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 30px 20px 50px;
+    position: relative; z-index: 1;
+    border-top: 1px solid rgba(247,184,203,0.1);
+  }
+  .footer p {
+    font-size: 0.85rem;
+    color: rgba(247,184,203,0.4);
+    letter-spacing: 2px;
+  }
+
+  .file-input-overlay {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  #btn-sorpresa {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    z-index: 500;
+    font-size: 1rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #e8436a, #7c3a6b);
+    color: #fff;
+    border: 1px solid rgba(247,184,203,0.35);
+    cursor: pointer;
+    font-family: 'Cormorant Garamond', serif;
+    letter-spacing: 2px;
+    animation: pulse-sorpresa 2.2s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(232,67,106,0.5);
+  }
+  @keyframes pulse-sorpresa {
+    0%,100% { box-shadow: 0 0 20px rgba(232,67,106,0.5); }
+    50%      { box-shadow: 0 0 40px rgba(232,67,106,0.9), 0 0 70px rgba(232,67,106,0.3); }
+  }
+  #btn-sorpresa:hover { opacity: 0.88; transform: scale(1.06); }
+
+  #galaxia-overlay {
+    position: fixed; inset: 0; z-index: 800;
+    display: none;
+    background: radial-gradient(ellipse at bottom, #0d1b2a, #000000);
+  }
+  #galaxia-overlay.visible { display: block; }
+  #galaxia-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  #cerrar-galaxia {
+    position: fixed; top: 18px; right: 22px; z-index: 1000;
+    background: rgba(232,67,106,0.6); border: none; color: #fff;
+    font-size: 1.4rem; width: 42px; height: 42px;
+    border-radius: 50%; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+  }
+  #cerrar-galaxia.visible { display: flex; }
+  #cerrar-galaxia:hover { background: #e8436a; }
+
+  .foto-g {
+    position: fixed; z-index: 900;
+    border-radius: 14px; overflow: hidden;
+    border: 2px solid rgba(255,100,180,0.5);
+    box-shadow: 0 0 22px rgba(255,50,150,0.5);
+    cursor: pointer; opacity: 0;
+    animation: gFloatIn 0.7s forwards, gBob ease-in-out infinite;
+  }
+  .foto-g img { width:100%; height:100%; object-fit:cover; display:block; }
+  .foto-g-ph {
+    width:100%; height:100%;
+    background: rgba(232,67,106,0.2);
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    gap:6px; position:relative;
+    color:rgba(247,184,203,0.75);
+    font-size:0.75rem; font-family:'Cormorant Garamond',serif;
+    text-align:center; padding:8px;
+  }
+  .foto-g-ph input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .foto-g:hover { box-shadow: 0 0 40px rgba(255,80,160,0.85); }
+  @keyframes gFloatIn { from{opacity:0;transform:scale(0.3)} to{opacity:1} }
+  @keyframes gBob {
+    0%,100%{ transform:translateY(0) rotate(var(--gr)); }
+    50%    { transform:translateY(-11px) rotate(var(--gr)); }
+  }
+
+  #glightbox {
+    display:none; position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.93);
+    align-items:center; justify-content:center;
+  }
+  #glightbox.open { display:flex; }
+  #glightbox img { max-width:88vw; max-height:88vh; border-radius:14px; object-fit:contain; box-shadow:0 0 60px rgba(232,67,106,0.4); }
+  #glightbox button { position:fixed; top:16px; right:22px; font-size:2rem; background:none; border:none; color:#fff; cursor:pointer; opacity:0.7; }
+  #glightbox button:hover { opacity:1; }
+
+  @media(max-width: 768px) {
+    .banner { padding: 36px 16px 20px; }
+    .banner h1 { font-size: clamp(1.8rem, 8vw, 3rem); }
+    .player-section { margin-bottom: 32px; }
+    .player-card { padding: 20px 16px; }
+    .photo-grid { gap: 8px; }
+    .counter-card { gap: 10px; padding: 18px 14px; flex-wrap: wrap; justify-content: center; }
+    .counter-num { font-size: 1.8rem; }
+    .quote-text { font-size: clamp(1.1rem, 4vw, 1.5rem); }
+    .video-section { padding: 0 12px; }
+    #btn-sorpresa { font-size: 0.9rem; padding: 0.6rem 1.2rem; bottom: 16px; right: 16px; }
+  }
+  @media(max-width: 480px) {
+    .counter-card { gap: 12px; padding: 20px 18px; }
+    .counter-num { font-size: 2rem; }
+    .photo-grid { gap: 8px; }
+    .foto-g:nth-child(1) { width: 95px !important; height: 120px !important; }
+    .foto-g:nth-child(2) { width: 95px !important; height: 120px !important; }
+    .foto-g:nth-child(3) { width: 88px !important; height: 110px !important; }
+    .foto-g:nth-child(4) { width: 88px !important; height: 110px !important; }
+    .foto-g:nth-child(5) { width: 100px !important; height: 126px !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+
+<div class="banner">
+  <h1>Feliz Día<br>de la Mujer</h1>
+  <p class="subtitle">8 de Marzo &bull; Tu día especial</p>
+  <div class="heart-divider">🌸 💜 🌸</div>
+</div>
+
+<div class="player-section">
+  <div class="player-card">
+    <div class="player-top">
+      <div class="album-art" id="albumArt">🌸</div>
+      <div class="song-info">
+        <div class="song-title" id="songTitle">Vine A Buscarte</div>
+        <div class="song-artist" id="songArtist">Fonseca ✨</div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="time-row">
+        <span id="timeElapsed">0:00</span>
+        <span id="timeDuration">0:00</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+    </div>
+    <audio id="audioEl" src="https://github.com/codeninja543/codeninja5433/raw/refs/heads/main/Fonseca%20-%20Vine%20A%20Buscarte%20(Video%20Oficial).mp3"></audio>
+  </div>
+</div>
+
+<div class="gallery-section">
+  <div class="section-label">Recuerdos especiales</div>
+  <div class="photo-grid" id="photoGrid"></div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="Foto ampliada">
+</div>
+
+<div class="counter-section">
+  <div class="section-label">Juntos desde</div>
+  <div class="counter-card">
+    <div class="counter-unit">
+      <span class="counter-num" id="cYears">05</span>
+      <span class="counter-lbl">Años</span>
+    </div>
+    <span class="counter-sep">·</span>
+    <div class="counter-unit">
+      <span class="counter-num" id="cMonths">00</span>
+      <span class="counter-lbl">Meses</span>
+    </div>
+  </div>
+</div>
+
+<div class="quote-section">
+  <div class="section-label">Para ti</div>
+  <span class="quote-marks">"</span>
+  <p class="quote-text">
+    Una mujer con visión es imparable.
+    Eres la fuerza silenciosa que mueve el mundo,
+    la luz que ilumina cada rincón oscuro.
+    Hoy y siempre, gracias por existir.
+  </p>
+  <p class="quote-author">— Con todo mi amor 💜</p>
+</div>
+
+<div class="video-section">
+  <div class="section-label">Tu canción especial</div>
+  <div class="video-wrap" id="videoWrap">
+    <video src="https://github.com/codeninja543/video-code_ninja/raw/refs/heads/main/wiii%20cliente.mp4" controls playsinline></video>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>Hecho con 💜 — Feliz Día Internacional de la Mujer 🌸</p>
+</footer>
+
+<button id="btn-sorpresa" onclick="abrirGalaxia()">🌌 Sorpresa</button>
+
+<div id="galaxia-overlay">
+  <canvas id="galaxia-canvas"></canvas>
+</div>
+<div id="gfotos-container"></div>
+<div id="glightbox" onclick="cerrarGlightbox(event)">
+  <button onclick="cerrarGlightbox()">✕</button>
+  <img id="glightbox-img" src="" alt="">
+</div>
+<button id="cerrar-galaxia" onclick="cerrarGalaxia()">✕</button>
+
+<script>
+
+const colors = ['#e8436a','#f7b8cb','#d4a96a','#c97ab2','#fff0f5'];
+for(let i=0;i<28;i++){
+  const p = document.createElement('div');
+  p.className='petal';
+  p.style.left = Math.random()*100+'vw';
+  p.style.background = colors[Math.floor(Math.random()*colors.length)];
+  p.style.width = p.style.height = (5+Math.random()*9)+'px';
+  p.style.animationDuration = (6+Math.random()*10)+'s';
+  p.style.animationDelay = (Math.random()*10)+'s';
+  document.getElementById('particles').appendChild(p);
+}
+
+const audio = document.getElementById('audioEl');
+const playBtn = document.getElementById('playBtn');
+let isPlaying = false;
+
+function togglePlay(){
+  if(isPlaying){ audio.pause(); isPlaying=false; playBtn.textContent='▶'; }
+  else { audio.play(); isPlaying=true; playBtn.textContent='⏸'; }
+}
+
+audio.addEventListener('timeupdate', ()=>{
+  if(!audio.duration) return;
+  const pct = (audio.currentTime/audio.duration)*100;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('timeElapsed').textContent = fmt(audio.currentTime);
+  document.getElementById('timeDuration').textContent = fmt(audio.duration);
+});
+audio.addEventListener('ended', ()=>{ isPlaying=false; playBtn.textContent='▶'; });
+
+document.getElementById('progressBar').addEventListener('click', e=>{
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = (e.clientX - rect.left)/rect.width;
+  if(audio.duration) audio.currentTime = pct * audio.duration;
+});
+
+function fmt(s){
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return m+':'+(sec<10?'0':'')+sec;
+}
+
+const photoData = [
+  {src:"https://i.postimg.cc/Ss2mNYTb/IMG-20260308-WA0001.jpg"},
+  {src:"https://i.postimg.cc/RF6vVJPD/IMG-20260308-WA0003.jpg"},
+  {src:"https://i.postimg.cc/qRhpM6m9/IMG-20260308-WA0004.jpg"}
+];
+
+function renderPhotos(){
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = photoData.map((p,i)=>`
+    <div class="photo-card" onclick="photoClick(event,${i})" style="position:relative">
+      ${p.src
+        ? `<img src="${p.src}" alt="Foto ${i+1}">
+           <div class="photo-overlay"><span>Ver foto</span></div>`
+        : `<div class="photo-placeholder">
+             <span class="icon">📸</span>
+           </div>`
+      }
+    </div>
+  `).join('');
+}
+
+function photoClick(e,i){
+  if(photoData[i].src){
+    e.stopPropagation();
+    document.getElementById('lightboxImg').src = photoData[i].src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+}
+
+function closeLightbox(e){
+  if(!e || e.target !== document.getElementById('lightboxImg'))
+    document.getElementById('lightbox').classList.remove('open');
+}
+
+renderPhotos();
+
+const startDate = new Date('2021-10-01T11:20:00');
+
+function updateCounter(){
+  const now = new Date();
+  let y = now.getFullYear() - startDate.getFullYear();
+  let m = now.getMonth() - startDate.getMonth();
+  if(m < 0){ y--; m += 12; }
+  document.getElementById('cYears').textContent  = String(y).padStart(2,'0');
+  document.getElementById('cMonths').textContent = String(m).padStart(2,'0');
+}
+updateCounter();
+setInterval(updateCounter, 60000);
+</script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+  let gR=null, gS=null, gC=null, gCt=null, gActive=false;
+  const phrases=["Te Amo ❤️","Te Adoro 💜","Mi Princesa 👑","Te Amo ✨","Te Adoro 🌸","Mi Princesa 💫","Te Amo 🔥","Te Adoro 💕","Mi Princesa 🌹","Te Amo 🌺"];
+
+  function makeTxt(text){
+    const c=document.createElement('canvas'); c.width=1024; c.height=250;
+    const cx=c.getContext('2d');
+    cx.shadowColor="rgba(255,50,150,1)"; cx.shadowBlur=50;
+    const g=cx.createLinearGradient(0,0,c.width,0);
+    g.addColorStop(0,"#ff4da6"); g.addColorStop(0.5,"#ffffff"); g.addColorStop(1,"#ff4da6");
+    cx.font="bold 120px Arial"; cx.fillStyle=g; cx.textAlign='center'; cx.textBaseline='middle';
+    cx.fillText(text,c.width/2,c.height/2);
+    return new THREE.CanvasTexture(c);
+  }
+
+  function initGalaxia(){
+    const canvas=document.getElementById('galaxia-canvas');
+    gS=new THREE.Scene();
+    gC=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,3000);
+    gC.position.set(0,180,700);
+    gR=new THREE.WebGLRenderer({canvas,antialias:true});
+    gR.setSize(window.innerWidth,window.innerHeight);
+    gCt=new OrbitControls(gC,gR.domElement);
+    gCt.enableDamping=true;
+    gCt.enableZoom=true;
+    gCt.zoomSpeed=1.2;
+    gCt.minDistance=50;
+    gCt.maxDistance=2000;
+    gCt.touches={ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+
+   
+    gS.add(new THREE.Mesh(
+      new THREE.SphereGeometry(30,64,64),
+      new THREE.MeshStandardMaterial({color:0x000000,metalness:1,roughness:1})
+    ));
+
+    const dc=document.createElement('canvas'); dc.width=1024; dc.height=1024;
+    const dx=dc.getContext('2d');
+    const dg=dx.createRadialGradient(512,512,100,512,512,500);
+    dg.addColorStop(0,"rgba(255,255,255,0.9)");
+    dg.addColorStop(0.3,"rgba(255,200,0,0.95)");
+    dg.addColorStop(0.6,"rgba(255,100,0,0.9)");
+    dg.addColorStop(1,"rgba(0,0,0,0)");
+    dx.fillStyle=dg; dx.fillRect(0,0,1024,1024);
+    const disk=new THREE.Mesh(
+      new THREE.RingGeometry(40,120,256),
+      new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(dc),side:THREE.DoubleSide,transparent:true})
+    );
+    disk.rotation.x=Math.PI/2; gS.add(disk);
+
+    
+    const grp=new THREE.Group(); gS.add(grp);
+    for(let i=0;i<100;i++){
+      const mat=new THREE.SpriteMaterial({map:makeTxt(phrases[i%phrases.length]),transparent:true});
+      const sp=new THREE.Sprite(mat);
+      const angle=(i%(100/6))*(Math.PI*2/(100/6));
+      const armAngle=Math.floor(i/(100/6))*(Math.PI*2/6);
+      const dist=Math.pow(i/100,0.9)*500;
+      sp.position.set(Math.cos(angle+armAngle)*dist,(Math.random()-.5)*100,Math.sin(angle+armAngle)*dist);
+      sp.scale.set(65,12,1); grp.add(sp);
+    }
+
+    
+    const sg=new THREE.BufferGeometry();
+    const sp2=new Float32Array(6000*3);
+    for(let i=0;i<6000;i++){
+      sp2[i*3]=(Math.random()-.5)*8000;
+      sp2[i*3+1]=(Math.random()-.5)*8000;
+      sp2[i*3+2]=(Math.random()-.5)*8000;
+    }
+    sg.setAttribute('position',new THREE.BufferAttribute(sp2,3));
+    gS.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:1.2})));
+
+    const tl=new THREE.TextureLoader();
+    function mp(url,size,pos){
+      const p=new THREE.Mesh(new THREE.SphereGeometry(size,64,64),new THREE.MeshStandardMaterial({map:tl.load(url)}));
+      p.position.set(...pos); gS.add(p);
+    }
+    mp("https://threejs.org/examples/textures/planets/mars_1k_color.jpg",80,[600,200,-500]);
+    mp("https://threejs.org/examples/textures/planets/jupiter2_1k.jpg",150,[-900,-300,700]);
+    gS.add(new THREE.AmbientLight(0x8888aa,1));
+
+    const ck=new THREE.Clock();
+    function anim(){
+      if(!gActive) return;
+      const t=ck.getElapsedTime();
+      grp.rotation.y=t*0.015;
+      disk.rotation.z+=0.002;
+      grp.children.forEach((s,i)=>{
+        const sc=65+Math.sin(t*2+i)*8;
+        s.scale.set(sc,14,1);
+        s.material.opacity=0.85+Math.sin(t*3+i)*0.15;
+      });
+      gCt.update(); gR.render(gS,gC); requestAnimationFrame(anim);
+    }
+    anim();
+
+    window.addEventListener('resize',()=>{
+      if(!gR) return;
+      gC.aspect=window.innerWidth/window.innerHeight;
+      gC.updateProjectionMatrix();
+      gR.setSize(window.innerWidth,window.innerHeight);
+    });
+  }
+
+  const gPhotoData=[
+    "https://i.postimg.cc/FRdhskP8/IMG-20260308-WA0005.jpg",
+    "https://i.postimg.cc/CK6Fgs4q/IMG-20260308-WA0007.jpg",
+    "https://i.postimg.cc/WtctgwF4/IMG-20260308-WA0002.jpg",
+    "https://i.postimg.cc/Z0z0pxBh/IMG-20260308-WA0006.jpg",
+    "https://i.postimg.cc/HLmZBr8S/Screenshot-20260308-091601.jpg"
+  ];
+  const gPos=[
+    {top:'5%',  left:'2%',             w:130, h:165, rot:-7, delay:0.1},
+    {top:'4%',  right:'2%',            w:130, h:165, rot: 6, delay:0.2},
+    {top:'42%', left:'1%',             w:120, h:152, rot:-5, delay:0.3},
+    {top:'42%', right:'1%',            w:120, h:152, rot: 5, delay:0.4},
+    {bottom:'5%',left:'50%',           w:140, h:175, rot:-3, delay:0.5, center:true},
+  ];
+
+  function renderGFotos(){
+    const c=document.getElementById('gfotos-container'); c.innerHTML='';
+    gPos.forEach((p,i)=>{
+      const div=document.createElement('div'); div.className='foto-g';
+      const ml=p.center?`margin-left:-${p.w/2}px;`:'';
+      div.style.cssText=`width:${p.w}px;height:${p.h}px;top:${p.top||''};bottom:${p.bottom||''};left:${p.left||''};right:${p.right||''};${ml}--gr:${p.rot}deg;animation:gFloatIn 0.7s ${p.delay}s forwards,gBob ${3+i*0.3}s ${p.delay+0.8}s ease-in-out infinite;display:none;`;
+      if(gPhotoData[i]){
+        div.innerHTML=`<img src="${gPhotoData[i]}" alt="">`;
+        div.addEventListener('click',()=>{
+          document.getElementById('glightbox-img').src=gPhotoData[i];
+          document.getElementById('glightbox').classList.add('open');
+        });
+      } else {
+        div.innerHTML=`<div class="foto-g-ph"><span style="font-size:1.9rem">📸</span><span>Agregar foto</span><input type="file" accept="image/*" onchange="cargarGFoto(event,${i})"></div>`;
+      }
+      c.appendChild(div);
+    });
+  }
+
+  window.cargarGFoto=function(e,i){
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=ev=>{ gPhotoData[i]=ev.target.result; renderGFotos(); mostrarGFotos(); };
+    r.readAsDataURL(f);
+  };
+
+  function mostrarGFotos(){ document.querySelectorAll('.foto-g').forEach(f=>f.style.display='block'); }
+  function ocultarGFotos(){ document.querySelectorAll('.foto-g').forEach(f=>f.style.display='none'); }
+
+  window.abrirGalaxia=function(){
+    document.getElementById('galaxia-overlay').classList.add('visible');
+    document.getElementById('cerrar-galaxia').classList.add('visible');
+    gActive=true;
+    if(!gR){ initGalaxia(); } else { gR.setSize(window.innerWidth,window.innerHeight); gC.aspect=window.innerWidth/window.innerHeight; gC.updateProjectionMatrix(); }
+    renderGFotos(); mostrarGFotos();
+  };
+
+  window.cerrarGalaxia=function(){
+    gActive=false;
+    document.getElementById('galaxia-overlay').classList.remove('visible');
+    document.getElementById('cerrar-galaxia').classList.remove('visible');
+    ocultarGFotos();
+  };
+
+  window.cerrarGlightbox=function(e){
+    if(!e || e.target!==document.getElementById('glightbox-img'))
+      document.getElementById('glightbox').classList.remove('open');
+  };
+</script>
+
+</body>
+</html>
